@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://l0nwb61asbiq"]
+
+[ext_resource type="Script" uid="uid://bl7tisw3y1j7m" path="res://Scripts/book.gd" id="1_kh36y"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_d7s7k"]
+
+[node name="Book" type="Node3D" unique_id=1705291075]
+script = ExtResource("1_kh36y")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1608563378]
+transform = Transform3D(2, 0, 0, 0, 1.4, 0, 0, 0, 0.05, 0, 0, 0)
+mesh = SubResource("BoxMesh_d7s7k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=906443393]
+
+[node name="Control" type="Control" parent="." unique_id=449551731]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=175555202]
+transparent_bg = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SubViewport" unique_id=1925560834]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="icon" type="TextureRect" parent="SubViewport/VBoxContainer" unique_id=1176909471]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="desc" type="Label" parent="SubViewport/VBoxContainer" unique_id=1865015285]
+unique_name_in_owner = true
+layout_mode = 2

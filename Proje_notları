@@ -1,0 +1,102 @@
+1 ========================================
+   2         GODOT BULMACA / TEST ODASI PROJESİ
+   3         Hatırlatma Notları
+   4         Tarih: 2026-07-02
+   5 ========================================
+   6
+   7 📁 PROJE YOLU
+   8 /home/emo/Godot/new-game-project/
+   9
+  10 🎮 OYUN TİPİ
+  11 - İlk kişi etkileşimli (FPS-ish) test odası / blockout
+  12 - Amaç: Mekanikleri test etme, tasarım deneyleri yapma
+  13 - Gelecekte: Bulmaca/ipucu tabanlı oyun olabilir (şu an öncelik değil)
+  14
+  15 🕹️ TEMALAR MEKANİKLER
+  16 - Hareket: WASD (Input: left, right, forward, back)
+  17 - Zıplama: Space (ui_accept)
+  18 - Fareyle Kamera Kontrolü: Fareyi tutarak bakma (MOUSE_MODE_CAPTURED)
+  19 - Etkileşim: E tuşu (Input: "Interact") → RayCast3D ile nesne tespiti
+     → interacted() çağrılır
+  20
+  21 🧰 ENVENTAR SİSTEMİ
+  22 - Script: InvManager.gd
+  23 - Yapı: var items = [] (Dizi)
+  24 - Fonksiyon: add_item(item_data: Dictionary) → öğe ekler, konsola
+     "Eklendi: [isim]" yazar
+  25 - Kapasite: Şu an sınırsız (isteğe bağlı olarak sınırlanabilir)
+  26
+  27 📖 ENVANTER KİTABI (UI)
+  28 - Script: book.gd
+  29 - Gösterme/Gizleme: M tuşu
+  30 - Sayfa Geçişi:
+  31   - Sağ Ok: next_page() → sonraki öğe
+  32   - Sol Ok: prev_page() → önceki öğe
+  33 - Debug Logları (Konsolda Görünür):
+  34   - "Sayfa ileri: [num]" → ileri geçişte
+  35   - "Sayfa geri: [num]" → geri geçişte
+  36   - "Son sayfadasınız!" → son sayfadaysa ve ileri basılırsa
+  37   - "İlk sayfadasınız!" → ilk sayfadaysa ve geri basılırsa
+  38 - Boş Envanter Mesajı: "Hiç bir eşyan yok" (kitapta görünür)
+  39
+  40 🧱 ÖRNEK ETKİLEŞİMLİ NESNE
+  41 - Script: static_body_3d.gd
+  42 - Örnek Öğe:
+  43   {
+  44     "name": "Blok1",
+  45     "description": "Dikdörtgen şeklinde bir blok",
+  46     "icon": preload("res://icon.svg")
+  47   }
+  48 - Etkileşim:
+  49   - interacted() çağrılır → öğe InvManager'a eklenir → nesne sahneden
+     kaldırılır (queue_free())
+  50
+  51 🎞️ SAHNE YAPISI (Scene/)
+  52 - char.tscn → Ana karakter (CharacterBody3D + kamera + RayCast3D +
+     etkileşim etiketi)
+  53 - book.tscn → Envanter kitabı UI'si (ikon + açıklama etiketleri)
+  54 - node_3d.tscn → Ana sahne:
+  55   - Char (örnek karakter)
+  56   - Book (karakterin kamerasına bağlı)
+  57   - VoxelGI (ışıklandırma)
+  58   - DirectionalLight3D
+  59   - Oda (3D model: Oda.obj)
+  60   - Birkaç StaticBody3D (etiketli bloklar, static_body_3d.gd
+     kullanıyor)
+  61
+  62 ⚙️ PROJE AYARLARI (project.godot)
+  63 - Oyun Adı: "New Game Project"
+  64 - Ana Sahne: res://Scene/node_3d.tscn
+  65 - Fizik Motoru: Jolt Physics (3d/physics_engine)
+  66 - Rendering Driver: Windows'ta d3d12
+  67 - Giriş Eylemleri:
+  68   - left: A (65)
+  69   - right: D (68)
+  70   - forward: W (87)
+  71   - back: S (83)
+  72   - escape: Esc (4194305)
+  73   - Interact: E (101)
+  74   - Menu: M (4194306)
+  75   - ui_accept: Space (zıplama)
+  76
+  77 📌 NOTLAR & İPUÇLAR
+  78 - Envanter şu anda bir "sayaç ve not defteri" görevi görüyor
+  79 - Her blok toplandığında envantere eklenir ve kendisi silinir
+  80 - Envanter kitabı, öğelerin ikonunu ve açıklamasını gösterir
+  81 - Debug logları sayesinde sayfa geçişleri konsolda takip edilebilir
+  82 - Tasarım aşamasında:
+  83   - Bloklar duvar, platform, engel olarak kullanılabilir
+  84   - Kamera ve hareket hassasiyeti character_body_3d.gd'den
+     ayarlanabilir
+  85   - Etkileşim mesafesi RayCast3D uzunluğuyla ayarlanabilir
+  86   - Gelecekte farklı öğe türleri (not, anahtar, fotoğraf vb.)
+     eklenebilir
+  87   - Envanter kapasitesi sınırlanabilir
+  88   - Öğeler kullanılarak veya birleştirilerek yeni şeyler ortaya
+     çıkabilir
+  89
+  90 ========================================
+  91 Bu dosya, projeyle ilgili kritik bilgileri içerir.
+  92 Sohbeti kapatsan da bu dosyayı okuyarak hatırlayabilir veya bana
+     yeniden yönlendirebilirsin.
+  93 ========================================
