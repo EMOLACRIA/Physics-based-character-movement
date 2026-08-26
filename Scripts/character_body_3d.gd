@@ -1,10 +1,14 @@
 extends CharacterBody3D
 
-var max_ground_speed = 8.13
+@export var max_ground_speed: float = 8.13
+@export var ground_accelerate: float = 10.0
+@export var look_sensitivity: float = 0.006
 
-@export var look_sensitivity = 0.006
+
+
 @onready var cast = %SeeCast
 @onready var interacttxt = %Intertact
+
 
 
 func _unhandled_input(event):
@@ -38,7 +42,7 @@ func _physics_process(delta: float) -> void:
 	# Etkileşime geçebileceği objenin önüne gelince bir text çıkartır ve
 	# etkileşime geçince "interacted" fonksiyonunu çalıştırır
 	
-	process_ground_movement()
+	process_ground_movement(delta)
 	
 	move_and_slide()
 
@@ -63,11 +67,27 @@ func get_wish_speed() -> float:
 	return input_dir.length() * max_ground_speed
 	# Girdinin kuvvetine göre max_ground_speed hesaplanır
 
-func process_ground_movement() -> void:
+func process_ground_movement(delta: float) -> void:
 	var wish_dir = get_wish_direction()
 	var wish_speed = get_wish_speed()
 	
-	velocity.x = wish_dir.x * wish_speed
-	velocity.z = wish_dir.z * wish_speed
+	accelerate(wish_dir, wish_speed, delta)
 	
-	#Bu fonksiyon ise wish_dir/speed'i kapsül'ün x ve z ekenindeki velocity'sine uygular.
+	# Wish_dir ve wish_speed'e uygun bir şekilde kapsülün velocity'sini kademeli olarak artırır.
+
+func accelerate(wish_dir: Vector3, wish_speed: float, delta: float) -> void:
+	var current_speed = velocity.dot(wish_dir)
+	var add_speed = wish_speed - current_speed
+	
+	# Kapsülün güncel hızını hesaplar (current_speed) ve 
+	# Ne kadar hız eklemesi gerektiğini hesaplar (add_speed()
+	
+	if add_speed <= 0:
+		return
+	
+	var accel_speed = ground_accelerate * delta * wish_speed
+	accel_speed = minf(accel_speed, add_speed)
+	
+	velocity += wish_dir * accel_speed
+	
+	# Kapsülün kademeli hızlandırmasını hesaplar ve velocity'ye ekler.
