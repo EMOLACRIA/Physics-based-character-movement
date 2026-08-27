@@ -144,6 +144,7 @@ func process_air_movement(delta: float) -> void:
 	var wish_speed = get_air_wish_speed()
 	
 	accelerate(wish_dir, wish_speed, delta)
+	# process_ground_movement'ta olan şeyleri air_wish_speed ile yeniden uygular.
 
 func get_air_wish_speed() -> float:
 	var input_dir = read_movement_input()
