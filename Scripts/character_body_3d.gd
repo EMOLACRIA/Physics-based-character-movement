@@ -3,7 +3,8 @@ extends CharacterBody3D
 @export var max_ground_speed: float = 8.13
 @export var ground_accelerate: float = 10.0
 @export var look_sensitivity: float = 0.006
-
+@export var stop_speed: float = 0.1
+@export var ground_friction: float = 6.0
 
 
 @onready var cast = %SeeCast
@@ -42,9 +43,13 @@ func _physics_process(delta: float) -> void:
 	# Etkileşime geçebileceği objenin önüne gelince bir text çıkartır ve
 	# etkileşime geçince "interacted" fonksiyonunu çalıştırır
 	
+	apply_ground_friction(delta)
+	
 	process_ground_movement(delta)
 	
 	move_and_slide()
+	
+	
 
 func read_movement_input() -> Vector2:
 	return Input.get_vector("left", "right", "forward", "back")
@@ -80,7 +85,8 @@ func accelerate(wish_dir: Vector3, wish_speed: float, delta: float) -> void:
 	var add_speed = wish_speed - current_speed
 	
 	# Kapsülün güncel hızını hesaplar (current_speed) ve 
-	# Ne kadar hız eklemesi gerektiğini hesaplar (add_speed()
+	# Ne kadar hız eklemesi gerektiğini hesaplar (add_speed(
+	# Kapsülün güncel hızını, kapsülün gidebileceği maksimum hızdan çıkartır))
 	
 	if add_speed <= 0:
 		return
@@ -91,3 +97,25 @@ func accelerate(wish_dir: Vector3, wish_speed: float, delta: float) -> void:
 	velocity += wish_dir * accel_speed
 	
 	# Kapsülün kademeli hızlandırmasını hesaplar ve velocity'ye ekler.
+
+func apply_ground_friction(delta: float) -> void:
+	var speed = Vector2(velocity.x, velocity.z).length()
+	
+	# Hızın büyüklüğünü ölçer.
+	
+	if speed < stop_speed:
+		velocity.x = 0.0
+		velocity.z = 0.0
+		return
+		# Eğer ölçülen hız stop_speed'den küçükce kapsül'ün velocity'sini sıfırlar.
+	
+	var drop = speed * ground_friction * delta
+	
+	var new_speed = speed - drop
+	
+	new_speed = maxf(new_speed, 0)
+	
+	var scale = new_speed / speed
+	
+	velocity.x *= scale
+	velocity.z *= scale
