@@ -7,6 +7,7 @@ extends CharacterBody3D
 @export var ground_friction: float = 6.0
 @export var gravity: float = 20.3
 @export var jump_height: float = 1.14
+@export var max_air_speed: float = 2.0
 
 
 @onready var cast = %SeeCast
@@ -47,8 +48,13 @@ func _physics_process(delta: float) -> void:
 	
 	apply_gravity(delta)
 	process_jump()
-	apply_ground_friction(delta)
-	process_ground_movement(delta)
+	
+	if is_on_floor():
+		apply_ground_friction(delta)
+		process_ground_movement(delta)
+	else:
+		process_air_movement(delta)
+	
 	move_and_slide()
 
 func read_movement_input() -> Vector2:
@@ -132,3 +138,14 @@ func process_jump() -> void:
 	if is_on_floor() and Input.is_action_just_pressed("jump"):
 		velocity.y = get_jump_velocity()
 	# "jump" input'u alındığında kapsüle y ekseninde hesaplanan velocity'i verir
+
+func process_air_movement(delta: float) -> void:
+	var wish_dir = get_wish_direction()
+	var wish_speed = get_air_wish_speed()
+	
+	accelerate(wish_dir, wish_speed, delta)
+
+func get_air_wish_speed() -> float:
+	var input_dir = read_movement_input()
+	return input_dir.length() * max_air_speed
+	# Girdinin kuvvetine göre max_air_speed hesaplanır
