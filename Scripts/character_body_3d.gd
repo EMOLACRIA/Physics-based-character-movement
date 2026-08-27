@@ -107,15 +107,16 @@ func apply_ground_friction(delta: float) -> void:
 		velocity.x = 0.0
 		velocity.z = 0.0
 		return
-		# Eğer ölçülen hız stop_speed'den küçükce kapsül'ün velocity'sini sıfırlar.
+		# Eğer ölçülen hız stop_speed'den küçükse kapsül'ün velocity'sini sıfırlar.
 	
 	var drop = speed * ground_friction * delta
-	
+	# Friction'dan dolayı azalacak hızı hesaplar.
 	var new_speed = speed - drop
-	
+	# Friction uygulandıktan sonra yeni hızı hesaplar.
 	new_speed = maxf(new_speed, 0)
-	
+	# Oyuncunun yeni hızını 0'dan aşağı olmasını engeller.
 	var scale = new_speed / speed
-	
+	# Yeni hız ile eski hızı oranlayarak friction'ın oranını hesaplar.
 	velocity.x *= scale
 	velocity.z *= scale
+	# Hesaplanan friction oranını kapsül'ün velocity'sine uygular.
