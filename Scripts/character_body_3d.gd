@@ -5,7 +5,7 @@ extends CharacterBody3D
 @export var look_sensitivity: float = 0.006
 @export var stop_speed: float = 0.1
 @export var ground_friction: float = 6.0
-
+@export var gravity: float = 20.3
 
 @onready var cast = %SeeCast
 @onready var interacttxt = %Intertact
@@ -43,13 +43,10 @@ func _physics_process(delta: float) -> void:
 	# Etkileşime geçebileceği objenin önüne gelince bir text çıkartır ve
 	# etkileşime geçince "interacted" fonksiyonunu çalıştırır
 	
+	apply_gravity(delta)
 	apply_ground_friction(delta)
-	
 	process_ground_movement(delta)
-	
 	move_and_slide()
-	
-	
 
 func read_movement_input() -> Vector2:
 	return Input.get_vector("left", "right", "forward", "back")
@@ -120,3 +117,6 @@ func apply_ground_friction(delta: float) -> void:
 	velocity.x *= scale
 	velocity.z *= scale
 	# Hesaplanan friction oranını kapsül'ün velocity'sine uygular.
+
+func apply_gravity(delta: float) -> void:
+	velocity.y -= gravity * delta
