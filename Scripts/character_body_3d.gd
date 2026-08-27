@@ -6,6 +6,8 @@ extends CharacterBody3D
 @export var stop_speed: float = 0.1
 @export var ground_friction: float = 6.0
 @export var gravity: float = 20.3
+@export var jump_height: float = 1.14
+
 
 @onready var cast = %SeeCast
 @onready var interacttxt = %Intertact
@@ -44,6 +46,7 @@ func _physics_process(delta: float) -> void:
 	# etkileşime geçince "interacted" fonksiyonunu çalıştırır
 	
 	apply_gravity(delta)
+	process_jump()
 	apply_ground_friction(delta)
 	process_ground_movement(delta)
 	move_and_slide()
@@ -120,3 +123,12 @@ func apply_ground_friction(delta: float) -> void:
 
 func apply_gravity(delta: float) -> void:
 	velocity.y -= gravity * delta
+
+func get_jump_velocity() -> float:
+	return sqrt(2 * gravity * jump_height)
+	# Kapsülün zıplarken kazanması gereken velocity'i hesaplar.
+
+func process_jump() -> void:
+	if is_on_floor() and Input.is_action_just_pressed("jump"):
+		velocity.y = get_jump_velocity()
+	# "jump" input'u alındığında kapsüle y ekseninde hesaplanan velocity'i verir
