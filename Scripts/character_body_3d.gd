@@ -8,6 +8,7 @@ extends CharacterBody3D
 @export var gravity: float = 20.3
 @export var jump_height: float = 1.14
 @export var max_air_speed: float = 2.0
+@export var air_accelerate: float = 1.0
 
 
 @onready var cast = %SeeCast
@@ -82,11 +83,11 @@ func process_ground_movement(delta: float) -> void:
 	var wish_dir = get_wish_direction()
 	var wish_speed = get_wish_speed()
 	
-	accelerate(wish_dir, wish_speed, delta)
+	accelerate(wish_dir, wish_speed, ground_accelerate, delta)
 	
 	# Wish_dir ve wish_speed'e uygun bir şekilde kapsülün velocity'sini kademeli olarak artırır.
 
-func accelerate(wish_dir: Vector3, wish_speed: float, delta: float) -> void:
+func accelerate(wish_dir: Vector3, wish_speed: float, accel: float, delta: float) -> void:
 	var current_speed = velocity.dot(wish_dir)
 	var add_speed = wish_speed - current_speed
 	
@@ -97,7 +98,7 @@ func accelerate(wish_dir: Vector3, wish_speed: float, delta: float) -> void:
 	if add_speed <= 0:
 		return
 	
-	var accel_speed = ground_accelerate * delta * wish_speed
+	var accel_speed = accel * delta * wish_speed
 	accel_speed = minf(accel_speed, add_speed)
 	
 	velocity += wish_dir * accel_speed
@@ -143,7 +144,7 @@ func process_air_movement(delta: float) -> void:
 	var wish_dir = get_wish_direction()
 	var wish_speed = get_air_wish_speed()
 	
-	accelerate(wish_dir, wish_speed, delta)
+	accelerate(wish_dir, wish_speed, air_accelerate, delta)
 	# process_ground_movement'ta olan şeyleri air_wish_speed ile yeniden uygular.
 
 func get_air_wish_speed() -> float:
