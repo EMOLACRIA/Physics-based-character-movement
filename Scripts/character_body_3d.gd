@@ -8,7 +8,8 @@ extends CharacterBody3D
 @export var gravity: float = 20.3
 @export var jump_height: float = 1.14
 @export var max_air_speed: float = 2.0
-@export var air_accelerate: float = 1.0
+@export var air_accelerate: float = 40.0
+@export var air_control: float = 0.45
 
 
 @onready var cast = %SeeCast
@@ -146,8 +147,25 @@ func process_air_movement(delta: float) -> void:
 	
 	accelerate(wish_dir, wish_speed, air_accelerate, delta)
 	# process_ground_movement'ta olan şeyleri air_wish_speed ile yeniden uygular.
+	apply_air_control(wish_dir, delta)
 
 func get_air_wish_speed() -> float:
 	var input_dir = read_movement_input()
 	return input_dir.length() * max_air_speed
 	# Girdinin kuvvetine göre max_air_speed hesaplanır
+
+func apply_air_control(wish_dir: Vector3, delta:float) -> void:
+	if wish_dir.is_zero_approx():
+		return
+	
+	var speed = Vector2(velocity.x, velocity.z).length()
+	var current_dir = Vector2(velocity.x, velocity.z).normalized()
+	var wish_dir_2d = Vector2(wish_dir.x, wish_dir.z)
+	var alignment = current_dir.dot(wish_dir_2d)
+	
+	print(alignment)
+	
+	
+	var new_dir = current_dir.lerp(wish_dir_2d, air_control * delta).normalized()
+	velocity.x = new_dir.x * speed
+	velocity.z = new_dir.y * speed
