@@ -4,13 +4,14 @@ extends CharacterBody3D
 @export var ground_accelerate: float = 10.0
 @export var look_sensitivity: float = 0.006
 @export var stop_speed: float = 0.1
-@export var ground_friction: float = 12.0
+@export var ground_friction: float = 8.0
 @export var gravity: float = 20.3
 @export var jump_height: float = 1.14
 @export var max_air_speed: float = 2.0
 @export var air_accelerate: float = 40.0
 @export var air_control: float = 0.45
 @export var coyote_time: float = 0.1
+@export var jump_buffer_time: float = 0.15
 
 
 @onready var cast = %SeeCast
@@ -18,6 +19,8 @@ extends CharacterBody3D
 var just_landed: bool = false
 var was_on_floor: bool = false
 var coyote_time_left: float = 0.0
+var jump_buffer_time_left: float = 0.0
+
 
 
 func _unhandled_input(event):
@@ -40,6 +43,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		coyote_time_left = maxf(coyote_time_left - delta, 0.0)
 	
+	if Input.is_action_just_pressed("jump"): 
+		jump_buffer_time_left = jump_buffer_time
+	else:
+		jump_buffer_time_left = maxf(jump_buffer_time_left, 0.0)
 	#------------------------------------------------
 	
 	interacttxt.hide()
@@ -147,11 +154,11 @@ func get_jump_velocity() -> float:
 	return sqrt(2 * gravity * jump_height)
 	# Kapsülün zıplarken kazanması gereken velocity'i hesaplar.
 
-func process_jump() -> void:
-	if coyote_time_left > 0.0 and Input.is_action_just_pressed("jump"):
+func process_jump() -> void:	
+	if coyote_time_left > 0.0 and jump_buffer_time_left > 0.0:
 		velocity.y = get_jump_velocity()
 		coyote_time_left = 0.0
-	# "jump" input'u alındığında kapsüle y ekseninde hesaplanan velocity'i verir
+		jump_buffer_time_left = 0.0
 	
 
 func process_air_movement(delta: float) -> void:
