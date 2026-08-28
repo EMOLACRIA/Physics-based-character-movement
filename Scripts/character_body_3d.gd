@@ -14,7 +14,8 @@ extends CharacterBody3D
 
 @onready var cast = %SeeCast
 @onready var interacttxt = %Intertact
-
+var just_landed: bool = false
+var was_on_floor: bool = false
 
 
 func _unhandled_input(event):
@@ -48,16 +49,21 @@ func _physics_process(delta: float) -> void:
 	# Etkileşime geçebileceği objenin önüne gelince bir text çıkartır ve
 	# etkileşime geçince "interacted" fonksiyonunu çalıştırır
 	
+	just_landed = is_on_floor() and not was_on_floor
+	
 	apply_gravity(delta)
 	process_jump()
 	
 	if is_on_floor():
-		apply_ground_friction(delta)
+		if not just_landed:
+			apply_ground_friction(delta)
 		process_ground_movement(delta)
 	else:
 		process_air_movement(delta)
 	
+	was_on_floor = is_on_floor()
 	move_and_slide()
+	
 
 func read_movement_input() -> Vector2:
 	return Input.get_vector("left", "right", "forward", "back")
@@ -163,8 +169,9 @@ func apply_air_control(wish_dir: Vector3, delta:float) -> void:
 	var wish_dir_2d = Vector2(wish_dir.x, wish_dir.z)
 	var alignment = current_dir.dot(wish_dir_2d)
 	
-	print(alignment)
 	
+	if alignment <= 0:
+		return
 	
 	var new_dir = current_dir.lerp(wish_dir_2d, air_control * delta).normalized()
 	velocity.x = new_dir.x * speed
