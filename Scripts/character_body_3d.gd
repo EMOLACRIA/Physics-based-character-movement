@@ -12,6 +12,7 @@ extends CharacterBody3D
 @export var air_control: float = 0.45
 @export var coyote_time: float = 0.1
 @export var jump_buffer_time: float = 0.15
+@export var autobhop_enabled: bool = true
 
 
 @onready var cast = %SeeCast
@@ -46,7 +47,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump"): 
 		jump_buffer_time_left = jump_buffer_time
 	else:
-		jump_buffer_time_left = maxf(jump_buffer_time_left, 0.0)
+		jump_buffer_time_left = maxf(jump_buffer_time_left - delta, 0.0)
 	#------------------------------------------------
 	
 	interacttxt.hide()
@@ -75,7 +76,6 @@ func _physics_process(delta: float) -> void:
 	
 	was_on_floor = is_on_floor()
 	move_and_slide()
-	
 
 func read_movement_input() -> Vector2:
 	return Input.get_vector("left", "right", "forward", "back")
@@ -159,7 +159,13 @@ func process_jump() -> void:
 		velocity.y = get_jump_velocity()
 		coyote_time_left = 0.0
 		jump_buffer_time_left = 0.0
+		return
 	
+	if autobhop_enabled == true and Input.is_action_pressed("jump") and is_on_floor():
+		velocity.y = get_jump_velocity()
+		coyote_time_left = 0.0
+		jump_buffer_time_left = 0.0
+
 
 func process_air_movement(delta: float) -> void:
 	var wish_dir = get_wish_direction()
