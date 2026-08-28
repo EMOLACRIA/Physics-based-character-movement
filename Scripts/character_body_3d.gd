@@ -4,18 +4,20 @@ extends CharacterBody3D
 @export var ground_accelerate: float = 10.0
 @export var look_sensitivity: float = 0.006
 @export var stop_speed: float = 0.1
-@export var ground_friction: float = 6.0
+@export var ground_friction: float = 12.0
 @export var gravity: float = 20.3
 @export var jump_height: float = 1.14
 @export var max_air_speed: float = 2.0
 @export var air_accelerate: float = 40.0
 @export var air_control: float = 0.45
+@export var coyote_time: float = 0.1
 
 
 @onready var cast = %SeeCast
 @onready var interacttxt = %Intertact
 var just_landed: bool = false
 var was_on_floor: bool = false
+var coyote_time_left: float = 0.0
 
 
 func _unhandled_input(event):
@@ -33,7 +35,10 @@ func _unhandled_input(event):
 	# Fare görünmezken kamerayı kontrol etmeni sağlar ve belli açılarda clamp'ler
 
 func _physics_process(delta: float) -> void:
-	
+	if is_on_floor():
+		coyote_time_left = coyote_time
+	else:
+		coyote_time_left = maxf(coyote_time_left - delta, 0.0)
 	
 	#------------------------------------------------
 	
@@ -143,9 +148,11 @@ func get_jump_velocity() -> float:
 	# Kapsülün zıplarken kazanması gereken velocity'i hesaplar.
 
 func process_jump() -> void:
-	if is_on_floor() and Input.is_action_just_pressed("jump"):
+	if coyote_time_left > 0.0 and Input.is_action_just_pressed("jump"):
 		velocity.y = get_jump_velocity()
+		coyote_time_left = 0.0
 	# "jump" input'u alındığında kapsüle y ekseninde hesaplanan velocity'i verir
+	
 
 func process_air_movement(delta: float) -> void:
 	var wish_dir = get_wish_direction()
